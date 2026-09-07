@@ -1,0 +1,14 @@
+[Unit]
+Description=Build local ACPI override table dynamically for U9311
+DefaultDependencies=no
+After=local-fs.target
+Before=sysinit.target
+ConditionPathExists=!/etc/acpi-overrides/SSDT4.aml
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/u9311-acpi-builder.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
