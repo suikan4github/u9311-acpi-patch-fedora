@@ -77,14 +77,17 @@ function make_and_install_patch() {
     fi
 
     # Install
-    if command -v rpm-ostree >/dev/null 2>&1; then
+    if [[ -e /run/ostree-booted ]] && command -v rpm-ostree >/dev/null 2>&1; then
         log_message "Environment: Fedora Atomic Desktop (rpm-ostree)"
         log_message "${MODULE_NAME}: Installing RPM by rpm-ostree..."
         sudo rpm-ostree install "${RPM_FILE}" || return 1
-    else
+    elif command -v dnf >/dev/null 2>&1; then
         log_message "Environment: Standard Fedora (Package-based / Workstation)"
         log_message "${MODULE_NAME}: Installing RPM by dnf..."
         sudo dnf install -y "${RPM_FILE}" || return 1
+    else
+        log_error "${MODULE_NAME}: No supported package manager was found."
+        return 1
     fi
 
 
