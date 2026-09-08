@@ -4,7 +4,7 @@ set -e
 DST_DIR="/etc/acpi-overrides"
 PATCH_FILE="/usr/share/u9311-acpi-patch/ssdt4.patch"
 
-# すでに AML が存在する場合はスキップ
+# Skip if the AML file already exists
 if [ -f "${DST_DIR}/SSDT4.aml" ]; then
     echo "[u9311-acpi-builder] SSDT4.aml already exists. Skipping build."
     exit 0
@@ -29,7 +29,7 @@ iasl -tc SSDT4.dsl
 
 mkdir -p "$DST_DIR"
 
-# アトミック（不可分）に移動
+# Move atomically
 mv -f SSDT4.aml "${DST_DIR}/SSDT4.aml"
 
 echo "[u9311-acpi-builder] Regenerating initramfs to update embedded BIOS version and module..."

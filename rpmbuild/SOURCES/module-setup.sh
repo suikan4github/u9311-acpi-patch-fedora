@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# dracut から渡されない場合のフォールバック（念のための安全策）
+# Fallback if moddir is not provided by dracut
 moddir=${moddir:-$(dirname "$(realpath "$0")")}
 
 check() {
@@ -13,10 +13,10 @@ depends() {
 }
 
 install() {
-    # 起動処理（cmdlineフェーズ）にcheck-bios.shを登録
+    # Register check-bios.sh for the cmdline phase of the boot process
     inst_hook cmdline 01 "${moddir}/check-bios.sh"
 
-    # initramfs内にAMLとターゲットバージョン情報をコピー
+    # Copy the AML file and target BIOS version into the initramfs
     inst /usr/share/u9311-acpi-patch/SSDT4.aml /usr/share/u9311-acpi-patch/SSDT4.aml
     inst /usr/share/u9311-acpi-patch/bios_version_at_install /usr/share/u9311-acpi-patch/bios_version_at_install
 }
