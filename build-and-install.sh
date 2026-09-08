@@ -61,17 +61,22 @@ function make_and_install_patch() {
         "${REPO_ROOT}/rpmbuild/SPECS/u9311-acpi-patch.spec" \
         || return 1;
 
+    RPM_FILE=$(find "${REPO_ROOT}/rpmbuild/RPMS/x86_64" -maxdepth 1 -type f \
+        -name 'u9311-acpi-patch-*.x86_64.rpm' -print -quit)
+    if [ -z "${RPM_FILE}" ]; then
+        echo "${MODULE_NAME}: RPM output was not found." >&2
+        return 1
+    fi
 
     # Install
     if command -v rpm-ostree >/dev/null 2>&1; then
         echo "Environment: Fedora Atomic Desktop (rpm-ostree)"
         echo "${MODULE_NAME}: Installing RPM by rpm-ostree..."
-    #   sudo rpm-ostree install ./rpmbuild/RPMS/x86_64/u9311-acpi-patch-1.0-1.x86_64.rpm
+        sudo rpm-ostree install "${RPM_FILE}" || return 1
     else
         echo "Environment: Standard Fedora (Package-based / Workstation)"
-        echo "${MODULE_NAME}: Installing RPM by dns..."
-    #    sudo dnf upgrade --refresh -y && flatpak update -y
-    #    sudo dnf install ./rpmbuild/RPMS/x86_64/u9311-acpi-patch-1.0-1.x86_64.rpm
+        echo "${MODULE_NAME}: Installing RPM by dnf..."
+        sudo dnf install -y "${RPM_FILE}" || return 1
     fi
 
 

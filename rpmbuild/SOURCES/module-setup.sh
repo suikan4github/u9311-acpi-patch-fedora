@@ -4,8 +4,8 @@
 moddir=${moddir:-$(dirname "$(realpath "$0")")}
 
 check() {
-    [ -f /usr/share/u9311-acpi-patch/SSDT4.aml ] && return 0
-    return 1
+    [ -s /usr/share/u9311-acpi-patch/SSDT4.aml ] && \
+        [ -s /usr/share/u9311-acpi-patch/bios_version_at_install ]
 }
 
 depends() {

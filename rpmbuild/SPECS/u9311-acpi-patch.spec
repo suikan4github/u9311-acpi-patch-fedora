@@ -37,17 +37,17 @@ install -m 0755 %{SOURCE3} "${DRACUT_MOD_DIR}/check-bios.sh"
 %post
 # Rebuild the initramfs after installation to apply the changes
 if [ -e /run/ostree-booted ]; then
-    rpm-ostree initramfs --enable || true
+    rpm-ostree initramfs --enable
 else
-    dracut --force || true
+    dracut --force
 fi
 
 %postun
 if [ $1 -eq 0 ]; then
     if [ -e /run/ostree-booted ]; then
-        rpm-ostree initramfs --disable || true
+        rpm-ostree initramfs --enable
     else
-        dracut --force || true
+        dracut --force
     fi
 fi
 
