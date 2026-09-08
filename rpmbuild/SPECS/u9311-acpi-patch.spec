@@ -12,6 +12,7 @@ Source2:        module-setup.sh
 Source3:        check-bios.sh
 
 Requires:       dracut
+Requires:       util-linux-core
 
 %description
 Provides pre-compiled ACPI SSDT4 override with boot-time BIOS version check.
