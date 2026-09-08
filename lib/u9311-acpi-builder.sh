@@ -32,7 +32,7 @@ mkdir -p "$DST_DIR"
 # Move atomically
 mv -f SSDT4.aml "${DST_DIR}/SSDT4.aml"
 
-echo "[u9311-acpi-builder] Regenerating initramfs to update embedded BIOS version and module..."
+echo "[u9311-acpi-builder] Regenerating initramfs to update the ACPI override..."
 if [ -e /run/ostree-booted ]; then
     rpm-ostree initramfs --enable || {
         rpm-ostree initramfs --disable

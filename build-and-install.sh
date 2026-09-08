@@ -46,11 +46,6 @@ function make_and_install_patch() {
     toolbox run -c ${WORK_CONTAINER} -- iasl -sa SSDT4.dsl \
         || return 1;
 
-    echo "${MODULE_NAME}: Obtaining current version number..."
-    cat /sys/class/dmi/id/bios_version > bios_version_at_install \
-        || return 1;
-
-
     # Go back to the repository root.
     cd "${REPO_ROOT}" || exit 1;
 
