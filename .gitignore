@@ -1,2 +1,3 @@
 rpmbuild/SOURCES/SSDT4.*
 rpmbuild/SOURCES/bios_version_at_install
+rpmbuild/RPMS/*

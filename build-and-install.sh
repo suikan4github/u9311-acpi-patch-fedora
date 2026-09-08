@@ -1,5 +1,8 @@
 #! /bin/bash
 
+REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+export REPO_ROOT
+
 function make_and_install_patch() {
 
     MODULE_NAME=u9311-acpi-patch.rpm
@@ -12,7 +15,7 @@ function make_and_install_patch() {
         || return 1;
 
     echo "${MODULE_NAME}: Going to rpmbuild/SOURCES directory..."
-    cd rpmbuild/SOURCES || exit 1;
+    cd "${REPO_ROOT}/rpmbuild/SOURCES" || exit 1;
 
     # Obtain ACPI table. 
     echo "${MODULE_NAME}: Obtaining ACPI table..."
@@ -51,9 +54,14 @@ function make_and_install_patch() {
     # Without this background process, sudo timeout during the RPM build.
     while true; do sudo -n true; sleep 60; kill -0 "$$" 2>/dev/null || exit; done &
 
+    # Go back to the repository root.
+    cd "${REPO_ROOT}" || exit 1;
+
     # Build RPM
     echo "${MODULE_NAME}: Building RPM..."
-    toolbox run -c ${WORK_CONTAINER} -- rpmbuild --define "_topdir $(pwd)/rpmbuild" -bb rpmbuild/SPECS/u9311-acpi-patch.spec \
+    toolbox run -c "${WORK_CONTAINER}" -- \
+        rpmbuild --define "_topdir ${REPO_ROOT}/rpmbuild" -bb \
+        "${REPO_ROOT}/rpmbuild/SPECS/u9311-acpi-patch.spec" \
         || return 1;
 
 
@@ -78,11 +86,11 @@ function make_and_install_patch() {
 }
 
 # Export function to run from shell.
-export -f my_function
+export -f make_and_install_patch
 
 # execute function. inside new shell process. 
 # When finished, the background process inside funciton will be terminated.
 bash -c 'make_and_install_patch'
 
 # Un export function.
-export -n -f my_function
+export -n -f make_and_install_patch
