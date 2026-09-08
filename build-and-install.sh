@@ -1,19 +1,18 @@
 #! /bin/bash
 
-function make_patch() {
+function make_and_install_patch() {
 
     MODULE_NAME=u9311-acpi-patch.rpm
     WORK_CONTAINER=u9311-acpi-patch
 
     echo "${MODULE_NAME}: Creating work toolbox..."
-    toolbox create ${WORK_CONTAINER} \
-        || return 1;
+    toolbox create ${WORK_CONTAINER} # || return 1;
     echo "${MODULE_NAME}: Installing tools into work toolbox..."
     toolbox run -c ${WORK_CONTAINER} -- sudo dnf install -y rpm-build acpica-tools patch  \
         || return 1;
 
     echo "${MODULE_NAME}: Going to rpmbuild/SOURCES directory..."
-    cd rpm-build/SOURCES || exit 1;
+    cd rpmbuild/SOURCES || exit 1;
 
     # Obtain ACPI table. 
     echo "${MODULE_NAME}: Obtaining ACPI table..."
@@ -48,11 +47,42 @@ function make_patch() {
     cat /sys/class/dmi/id/bios_version > bios_version_at_install \
         || return 1;
 
+    # Keep sudo previledge in bakground. 
+    # Without this background process, sudo timeout during the RPM build.
+    while true; do sudo -n true; sleep 60; kill -0 "$$" 2>/dev/null || exit; done &
+
+    # Build RPM
+    echo "${MODULE_NAME}: Building RPM..."
+    toolbox run -c ${WORK_CONTAINER} -- rpmbuild --define "_topdir $(pwd)/rpmbuild" -bb rpmbuild/SPECS/u9311-acpi-patch.spec \
+        || return 1;
+
+
+    # Install
+    if command -v rpm-ostree >/dev/null 2>&1; then
+        echo "Environment: Fedora Atomic Desktop (rpm-ostree)"
+        echo "${MODULE_NAME}: Installing RPM by rpm-ostree..."
+    #   sudo rpm-ostree install ./rpmbuild/RPMS/noarch/u9311-acpi-patch-1.0-1.noarch.rpm
+    else
+        echo "Environment: Standard Fedora (Package-based / Workstation)"
+        echo "${MODULE_NAME}: Installing RPM by dns..."
+    #    sudo dnf upgrade --refresh -y && flatpak update -y
+    #    sudo dnf install ./rpmbuild/RPMS/noarch/u9311-acpi-patch-1.0-1.noarch.rpm
+    fi
+
+
+
     echo "${MODULE_NAME}: Removing the container before exiting..."
     toolbox rm ${WORK_CONTAINER} -f
 
     return 0
 }
 
-# execute function.
-make_patch
+# Export function to run from shell.
+export -f my_function
+
+# execute function. inside new shell process. 
+# When finished, the background process inside funciton will be terminated.
+bash -c 'make_and_install_patch'
+
+# Un export function.
+export -n -f my_function
