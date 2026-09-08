@@ -13,6 +13,8 @@ depends() {
 }
 
 install() {
+    inst_multiple logger
+
     # Register check-bios.sh for the cmdline phase of the boot process
     inst_hook cmdline 01 "${moddir}/check-bios.sh"
 
