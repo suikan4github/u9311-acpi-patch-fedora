@@ -50,9 +50,6 @@ function make_and_install_patch() {
     cat /sys/class/dmi/id/bios_version > bios_version_at_install \
         || return 1;
 
-    # Keep sudo previledge in bakground. 
-    # Without this background process, sudo timeout during the RPM build.
-    while true; do sudo -n true; sleep 60; kill -0 "$$" 2>/dev/null || exit; done &
 
     # Go back to the repository root.
     cd "${REPO_ROOT}" || exit 1;
@@ -85,12 +82,5 @@ function make_and_install_patch() {
     return 0
 }
 
-# Export function to run from shell.
-export -f make_and_install_patch
+make_and_install_patch
 
-# execute function. inside new shell process. 
-# When finished, the background process inside funciton will be terminated.
-bash -c 'make_and_install_patch'
-
-# Un export function.
-export -n -f make_and_install_patch
