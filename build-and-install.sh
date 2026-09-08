@@ -66,12 +66,12 @@ function make_and_install_patch() {
     if command -v rpm-ostree >/dev/null 2>&1; then
         echo "Environment: Fedora Atomic Desktop (rpm-ostree)"
         echo "${MODULE_NAME}: Installing RPM by rpm-ostree..."
-    #   sudo rpm-ostree install ./rpmbuild/RPMS/noarch/u9311-acpi-patch-1.0-1.noarch.rpm
+    #   sudo rpm-ostree install ./rpmbuild/RPMS/x86_64/u9311-acpi-patch-1.0-1.x86_64.rpm
     else
         echo "Environment: Standard Fedora (Package-based / Workstation)"
         echo "${MODULE_NAME}: Installing RPM by dns..."
     #    sudo dnf upgrade --refresh -y && flatpak update -y
-    #    sudo dnf install ./rpmbuild/RPMS/noarch/u9311-acpi-patch-1.0-1.noarch.rpm
+    #    sudo dnf install ./rpmbuild/RPMS/x86_64/u9311-acpi-patch-1.0-1.x86_64.rpm
     fi
 
 

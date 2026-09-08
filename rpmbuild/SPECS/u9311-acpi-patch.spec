@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        ACPI SSDT4 Override with BIOS Check for LIFEBOOK U9311
 
 License:        MIT
-BuildArch:      noarch
+BuildArch:      x86_64
 
 Source0:        SSDT4.aml
 Source1:        bios_version_at_install
