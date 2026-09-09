@@ -44,6 +44,8 @@ To install the RPM package, use the following command:
 ./build-and-install.sh
 ```
 
+On Fedora Atomic Desktop (rpm-ostree) systems, the script automatically enables initramfs regeneration (`rpm-ostree initramfs --enable`) before installing the package, because the RPM scriptlets cannot run `rpm-ostree` themselves. This creates one additional deployment.
+
 After installation, reboot your system to apply the ACPI patch.
 
 ## Uninstallation

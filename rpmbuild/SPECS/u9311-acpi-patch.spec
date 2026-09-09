@@ -1,6 +1,6 @@
 Name:           u9311-acpi-patch
 Version:        1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        ACPI SSDT4 Override for LIFEBOOK U9311
 
 License:        MIT
@@ -31,18 +31,19 @@ mkdir -p "${DRACUT_CONF_DIR}"
 install -m 0644 %{SOURCE1} "${DRACUT_CONF_DIR}/99-acpi-override.conf"
 
 %post
-# Rebuild the initramfs after installation to apply the changes
-if [ -e /run/ostree-booted ]; then
-    rpm-ostree initramfs --enable
-else
+# Rebuild the initramfs after installation to apply the changes.
+# On rpm-ostree (Atomic Desktop) systems, initramfs regeneration is handled
+# automatically by rpm-ostree itself after package installation, as long as
+# it has been enabled beforehand (rpm-ostree initramfs --enable).
+# NOTE: Never call rpm-ostree from a scriptlet: scriptlets run in a bwrap
+# sandbox without access to the system D-Bus, so it always fails.
+if [ ! -e /run/ostree-booted ]; then
     dracut --force
 fi
 
 %postun
 if [ $1 -eq 0 ]; then
-    if [ -e /run/ostree-booted ]; then
-        rpm-ostree initramfs --enable
-    else
+    if [ ! -e /run/ostree-booted ]; then
         dracut --force
     fi
 fi
@@ -52,5 +53,10 @@ fi
 /etc/dracut.conf.d/99-acpi-override.conf
 
 %changelog
+* Wed Sep 09 2026 Custom User <user@example.com> - 1.0-3
+- Fix %post scriptlet failure on rpm-ostree systems: never call rpm-ostree
+  from scriptlets (system D-Bus is unavailable in the scriptlet sandbox).
+  rpm-ostree regenerates the initramfs automatically when enabled.
+
 * Mon Sep 07 2026 Custom User <user@example.com> - 1.0-1
 - Initial release.

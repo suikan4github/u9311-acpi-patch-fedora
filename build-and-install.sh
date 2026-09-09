@@ -79,6 +79,11 @@ function make_and_install_patch() {
     # Install
     if [[ -e /run/ostree-booted ]] && command -v rpm-ostree >/dev/null 2>&1; then
         log_message "Environment: Fedora Atomic Desktop (rpm-ostree)"
+        # initramfs regeneration must be enabled BEFORE installing the package,
+        # because %post scriptlets cannot call rpm-ostree (no D-Bus in the
+        # scriptlet sandbox). This command is idempotent.
+        log_message "${MODULE_NAME}: Ensuring initramfs regeneration is enabled..."
+        sudo rpm-ostree initramfs --enable || return 1
         log_message "${MODULE_NAME}: Installing RPM by rpm-ostree..."
         sudo rpm-ostree install "${RPM_FILE}" || return 1
     elif command -v dnf >/dev/null 2>&1; then
